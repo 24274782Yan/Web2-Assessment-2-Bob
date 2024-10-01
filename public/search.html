@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Fundraisers</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        nav { margin-bottom: 20px; }
+        nav a { margin-right: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; }
+        tr:hover { background-color: #f1f1f1; }
+        img { max-width: 100px; }
+        .donate-btn { background-color: #4CAF50; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+        .donate-btn:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="search.html">Search Fundraisers</a>
+    </nav>
+
+    <h1>Search Fundraisers</h1>
+    <form id="search-form">
+        <label for="organizer">Organizer:</label>
+        <input type="text" id="organizer" name="organizer"><br>
+
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city"><br>
+
+        <label for="category">Category:</label>
+        <select id="category">
+            <option value="">Select Category</option>
+        </select><br>
+
+        <button type="submit">Search</button>
+    </form>
+
+    <h2>Results</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Organizer</th>
+                <th>Caption</th>
+                <th>Current Funding</th>
+                <th>Target Funding</th>
+                <th>City</th>
+                <th>Active</th>
+                <th>Category</th>
+                <th>Image</th>
+                <th>Donate</th>
+            </tr>
+        </thead>
+        <tbody id="search-results"></tbody>
+    </table>
+
+    <script>
+        // Fetch categories
+        fetch('http://localhost:3000/categories')
+            .then(response => response.json())
+            .then(categories => {
+                const categorySelect = document.getElementById('category');
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.CATEGORY_ID;
+                    option.textContent = category.NAME;
+                    categorySelect.appendChild(option);
+                });
+            });
+
+        // Handle search form submission
+        document.getElementById('search-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const organizer = document.getElementById('organizer').value;
+            const city = document.getElementById('city').value;
+            const categoryId = document.getElementById('category').value;
+
+            let url = 'http://localhost:3000/search?';
+            if (organizer) url += `organizer=${organizer}&`;
+            if (city) url += `city=${city}&`;
+            if (categoryId) url += `categoryId=${categoryId}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const results = document.getElementById('search-results');
+                    results.innerHTML = ''; // Clear results
+                    if (data.length === 0) {
+                        results.innerHTML = '<tr><td colspan="9" style="color: red; text-align: center;">No matching fundraisers found.</td></tr>';
+                    } else {
+                        data.forEach(fundraiser => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${fundraiser.ORGANIZER}</td>
+                                <td>${fundraiser.CAPTION}</td>
+                                <td>${fundraiser.CURRENT_FUNDING}</td>
+                                <td>${fundraiser.TARGET_FUNDING}</td>
+                                <td>${fundraiser.CITY}</td>
+                                <td>${fundraiser.ACTIVE ? 'Yes' : 'No'}</td>
+                                <td>${fundraiser.CATEGORY_NAME}</td>
+                                <td><img src="${fundraiser.IMAGE_URL || 'default-image.png'}" alt="Fundraiser Image"></td>
+                                <td><button class="donate-btn" onclick="showDonationDialog()">Donate</button></td>
+                            `;
+                            results.appendChild(row);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error fetching search results:', error));
+        });
+
+        function showDonationDialog() {
+            alert("This feature is under construction.");
+        }
+    </script>
+</body>
+</html>

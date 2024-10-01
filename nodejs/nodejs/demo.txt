@@ -1,0 +1,36 @@
+-- Create the database
+CREATE DATABASE crowdfunding_db;
+
+-- Use the database
+USE crowdfunding_db;
+
+-- Create CATEGORY table
+CREATE TABLE CATEGORY (
+    CATEGORY_ID INT AUTO_INCREMENT PRIMARY KEY,
+    NAME VARCHAR(255) NOT NULL
+);
+
+-- Create FUNDRAISER table
+CREATE TABLE FUNDRAISER (
+    FUNDRAISER_ID INT AUTO_INCREMENT PRIMARY KEY,
+    ORGANIZER VARCHAR(255) NOT NULL,
+    CAPTION VARCHAR(255) NOT NULL,
+    TARGET_FUNDING DECIMAL(10, 2) NOT NULL,
+    CURRENT_FUNDING DECIMAL(10, 2) NOT NULL,
+    CITY VARCHAR(255) NOT NULL,
+    ACTIVE BOOLEAN NOT NULL,
+    CATEGORY_ID INT,
+    FOREIGN KEY (CATEGORY_ID) REFERENCES CATEGORY(CATEGORY_ID)
+);
+
+-- Insert sample data into CATEGORY
+INSERT INTO CATEGORY (NAME) VALUES ('Medical'), ('Education'), ('Crisis Relief');
+
+-- Insert sample data into FUNDRAISER
+INSERT INTO FUNDRAISER (ORGANIZER, CAPTION, TARGET_FUNDING, CURRENT_FUNDING, CITY, ACTIVE, CATEGORY_ID) 
+VALUES 
+('Jackson', 'Help The Jackson\'s Rebuild After Flood', 10000, 7730, 'Byron Bay', TRUE, 1),
+('Linda', 'Support Local Schools', 15000, 5000, 'Melbourne', TRUE, 2),
+('Mark', 'Disaster Relief Fund', 20000, 15000, 'Sydney', TRUE, 3),
+('Anna', 'Animal Shelter Fundraiser', 12000, 9000, 'Brisbane', TRUE, 1),
+('Tom', 'Crisis Help Fund', 30000, 25000, 'Perth', TRUE, 3);

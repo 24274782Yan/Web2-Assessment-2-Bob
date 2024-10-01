@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crowdfunding</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .fundraiser { margin: 10px 0; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to Our Crowdfunding Platform</h1>
+        <nav>
+            <a href="#" onclick="loadFundraisers()">Home</a>
+            <a href="#" onclick="loadSearch()">Search Fundraisers</a>
+        </nav>
+    </header>
+    <main id="content"></main>
+    <script>
+        async function loadFundraisers() {
+            const response = await fetch('/fundraisers');
+            const fundraisers = await response.json();
+            const content = document.getElementById('content');
+            content.innerHTML = fundraisers.map(f => `<div class="fundraiser"><strong>${f.CAPTION}</strong> by ${f.ORGANIZER} - ${f.CURRENT_FUNDING}/${f.TARGET_FUNDING} in ${f.CITY}</div>`).join('');
+        }
+
+        async function loadSearch() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <h2>Search Fundraisers</h2>
+                <form id="searchForm">
+                    <input type="text" placeholder="Organizer" name="organizer">
+                    <input type="text" placeholder="City" name="city">
+                    <input type="number" placeholder="Category ID" name="category_id">
+                    <button type="submit">Search</button>
+                </form>
+                <div class="error" id="errorMessage"></div>
+                <div id="results"></div>
+            `;
+            document.getElementById('searchForm').onsubmit = async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const params = new URLSearchParams(formData).toString();
+                const response = await fetch(`/search?${params}`);
+                const results = await response.json();
+                if (results.length === 0) {
+                    document.getElementById('errorMessage').innerText = 'No fundraisers found';
+                } else {
+                    document.getElementById('errorMessage').innerText = '';
+                    document.getElementById('results').innerHTML = results.map(f => `<div>${f.CAPTION} by ${f.ORGANIZER}</div>`).join('');
+                }
+            };
+        }
+    </script>
+</body>
+</html>

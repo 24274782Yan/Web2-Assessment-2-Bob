@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crowdfunding Platform</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        nav { margin-bottom: 20px; }
+        nav a { margin-right: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; }
+        tr:hover { background-color: #f1f1f1; }
+        img { max-width: 100px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="search.html">Search Fundraisers</a>
+    </nav>
+
+    <h1>Welcome to Our Crowdfunding Platform</h1>
+    <p>Support various non-profit organizations to create a better future together!</p>
+
+    <h2>Current Active Fundraisers</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Organizer</th>
+                <th>Caption</th>
+                <th>Current Funding</th>
+                <th>Target Funding</th>
+                <th>City</th>
+                <th>Active</th>
+                <th>Category</th>
+                <th>Image</th>
+            </tr>
+        </thead>
+        <tbody id="fundraiser-list"></tbody>
+    </table>
+
+    <script>
+        fetch('http://localhost:3000/fundraisers')
+            .then(response => response.json())
+            .then(data => {
+                const fundraiserList = document.getElementById('fundraiser-list');
+                data.forEach(fundraiser => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${fundraiser.FUNDRAISER_ID}</td>
+                        <td>${fundraiser.ORGANIZER}</td>
+                        <td>${fundraiser.CAPTION}</td>
+                        <td>${fundraiser.CURRENT_FUNDING}</td>
+                        <td>${fundraiser.TARGET_FUNDING}</td>
+                        <td>${fundraiser.CITY}</td>
+                        <td>${fundraiser.ACTIVE ? 'Yes' : 'No'}</td>
+                        <td>${fundraiser.CATEGORY_NAME}</td>
+                        <td><img src="${fundraiser.IMAGE_URL || 'default-image.png'}" alt="Fundraiser Image"></td>
+                    `;
+                    fundraiserList.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching fundraisers:', error));
+    </script>
+</body>
+</html>
